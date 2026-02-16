@@ -250,6 +250,7 @@ public partial class UIStoresController
             : await _uriResolver.Resolve(Request.GetAbsoluteRootUri(), storeBlob.PaymentSoundUrl);
         vm.HtmlTitle = storeBlob.HtmlTitle;
         vm.SupportUrl = storeBlob.StoreSupportUrl;
+        vm.CheckoutText = storeBlob.CheckoutText;
         vm.DisplayExpirationTimer = (int)storeBlob.DisplayExpirationTimer.TotalMinutes;
         vm.ReceiptOptions = CheckoutAppearanceViewModel.ReceiptOptionsViewModel.Create(storeBlob.ReceiptOptions);
         vm.AutoDetectLanguage = storeBlob.AutoDetectLanguage;
@@ -382,6 +383,7 @@ public partial class UIStoresController
         blob.ReceiptOptions = model.ReceiptOptions.ToDTO();
         blob.HtmlTitle = string.IsNullOrWhiteSpace(model.HtmlTitle) ? null : model.HtmlTitle;
         blob.StoreSupportUrl = string.IsNullOrWhiteSpace(model.SupportUrl) ? null : model.SupportUrl.IsValidEmail() ? $"mailto:{model.SupportUrl}" : model.SupportUrl;
+        blob.CheckoutText = string.IsNullOrWhiteSpace(model.CheckoutText) ? null : model.CheckoutText;
         blob.DisplayExpirationTimer = TimeSpan.FromMinutes(model.DisplayExpirationTimer);
         blob.AutoDetectLanguage = model.AutoDetectLanguage;
         blob.DefaultLang = model.DefaultLang;
@@ -417,8 +419,8 @@ public partial class UIStoresController
         var defaultChoice = defaultPaymentId?.FindNearest(enabled);
         if (defaultChoice is null)
         {
-            defaultChoice = enabled.FirstOrDefault(e => e == PaymentTypes.CHAIN.GetPaymentMethodId(_networkProvider.DefaultNetwork.CryptoCode)) ??
-                            enabled.FirstOrDefault(e => e == PaymentTypes.LN.GetPaymentMethodId(_networkProvider.DefaultNetwork.CryptoCode)) ??
+            defaultChoice = enabled.FirstOrDefault(e => e == PaymentTypes.CHAIN.GetPaymentMethodId(_networkProvider.DefaultCryptoCode)) ??
+                            enabled.FirstOrDefault(e => e == PaymentTypes.LN.GetPaymentMethodId(_networkProvider.DefaultCryptoCode)) ??
                             enabled.FirstOrDefault();
         }
         var choices = GetEnabledPaymentMethodChoices(storeData);
